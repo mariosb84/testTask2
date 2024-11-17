@@ -47,7 +47,7 @@ public class ItemControllerTest {
     private TokenBlackListServiceData tokenBlackListServiceData;
 
     @MockBean
-    private JwtService jwtService;
+    private JwtServiceData jwtServiceData;
 
     @MockBean
     private SpringLiquibase liquibase;
@@ -72,8 +72,8 @@ public class ItemControllerTest {
     }
 
     private void setUpJwtMocks(String testJwt, int SetRole) {
-        when(jwtService.isTokenValid(eq(testJwt), any(UserDetails.class))).thenReturn(true);
-        when(jwtService.extractUserName(eq(testJwt))).thenReturn(setRoles(SetRole));
+        when(jwtServiceData.isTokenValid(eq(testJwt), any(UserDetails.class))).thenReturn(true);
+        when(jwtServiceData.extractUserName(eq(testJwt))).thenReturn(setRoles(SetRole));
         when(tokenBlackListServiceData.findByToken(eq(testJwt))).thenReturn(Optional.empty());
     }
 

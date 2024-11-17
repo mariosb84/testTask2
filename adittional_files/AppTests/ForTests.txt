@@ -537,7 +537,7 @@ package com.example.itemservice.controller;
 import com.example.itemservice.domain.dto.JwtAuthenticationResponseDto;
 import com.example.itemservice.domain.dto.SignInRequest;
 import com.example.itemservice.domain.dto.SignUpRequest;
-import com.example.itemservice.service.AuthenticationService;
+import com.example.itemservice.service.AuthenticationServiceData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -940,7 +940,7 @@ public class UserDto {
 
 package com.example.itemservice.filter;
 
-import com.example.itemservice.service.JwtService;
+import com.example.itemservice.service.JwtServiceData;
 import com.example.itemservice.service.TokenBlackListServiceData;
 import com.example.itemservice.service.UserServiceData;
 import liquibase.util.StringUtils;

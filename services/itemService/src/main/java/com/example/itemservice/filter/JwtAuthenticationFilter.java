@@ -1,6 +1,6 @@
 package com.example.itemservice.filter;
 
-import com.example.itemservice.service.JwtService;
+import com.example.itemservice.service.JwtServiceData;
 import com.example.itemservice.service.TokenBlackListServiceData;
 import com.example.itemservice.service.UserServiceData;
 import liquibase.util.StringUtils;
@@ -26,7 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public static final String BEARER_PREFIX = "Bearer ";
     public static final String HEADER_NAME = "Authorization";
-    private final JwtService jwtService;
+    private final JwtServiceData jwtServiceData;
     private final UserServiceData userService;
     private final TokenBlackListServiceData tokenBlackListServiceData;
 
@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         /* Обрезаем префикс и получаем имя пользователя из токена*/
         var jwt = authHeader.substring(BEARER_PREFIX.length());
-        var username = jwtService.extractUserName(jwt);
+        var username = jwtServiceData.extractUserName(jwt);
 
         if (StringUtils.isNotEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userService
@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             /* Если токен валиден, то аутентифицируем пользователя*/
             if (
-                    (jwtService.isTokenValid(jwt, userDetails))
+                    (jwtServiceData.isTokenValid(jwt, userDetails))
                             && (
                             (tokenBlackListServiceData.findByToken(jwt).isEmpty())
                                     || !(tokenBlackListServiceData.findByToken(jwt).get().getToken().equals(jwt))

@@ -18,10 +18,10 @@ import static com.example.itemservice.filter.JwtAuthenticationFilter.BEARER_PREF
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService {
+public class AuthenticationServiceData {
 
     private final UserServiceData userService;
-    private final JwtService jwtService;
+    private final JwtServiceData jwtServiceData;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final TokenBlackListServiceData tokenBlackListServiceData;
@@ -43,7 +43,7 @@ public class AuthenticationService {
                 .build();
         userService.add(user);
 
-        var jwt = jwtService.generateToken(user);
+        var jwt = jwtServiceData.generateToken(user);
         return new JwtAuthenticationResponseDto(jwt);
     }
 
@@ -63,7 +63,7 @@ public class AuthenticationService {
                 .userDetailsService()
                 .loadUserByUsername(request.getUsername());
 
-        var jwt = jwtService.generateToken(user);
+        var jwt = jwtServiceData.generateToken(user);
         return new JwtAuthenticationResponseDto(jwt);
     }
 
