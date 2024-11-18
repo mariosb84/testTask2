@@ -18,7 +18,7 @@ import static com.example.itemservice.filter.JwtAuthenticationFilter.BEARER_PREF
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationServiceData {
+public class AuthenticationServiceData implements AuthentificationService {
 
     private final UserServiceData userService;
     private final JwtServiceData jwtServiceData;
@@ -32,6 +32,7 @@ public class AuthenticationServiceData {
      * @param request данные пользователя
      * @return токен
      */
+    @Override
     public JwtAuthenticationResponseDto signUp(SignUpRequest request) {
 
         var user = User.builder()
@@ -53,6 +54,7 @@ public class AuthenticationServiceData {
      * @param request данные пользователя
      * @return токен
      */
+    @Override
     public JwtAuthenticationResponseDto signIn(SignInRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 request.getUsername(),
@@ -67,6 +69,7 @@ public class AuthenticationServiceData {
         return new JwtAuthenticationResponseDto(jwt);
     }
 
+    @Override
     public void logout(JwtAuthenticationResponseDto jwtAuthenticationResponseDto) {
         var jwt = jwtAuthenticationResponseDto.getToken().substring(BEARER_PREFIX.length());
         JwtAuthenticationResponse jwtAuthenticationResponse = new JwtAuthenticationResponse();

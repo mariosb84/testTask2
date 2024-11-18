@@ -11,22 +11,21 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthenticationServiceData authenticationServiceData;
 
-    @PostMapping("/sign-up")
+    @PostMapping("/auth/sign-up")
     public JwtAuthenticationResponseDto signUp(@RequestBody @Valid SignUpRequest request) {
         return authenticationServiceData.signUp(request);
     }
 
-    @PostMapping("/sign-in")
+    @PostMapping("/auth/sign-in")
     public JwtAuthenticationResponseDto signIn(@RequestBody @Valid SignInRequest request) {
         return authenticationServiceData.signIn(request);
     }
 
-    @PostMapping("/auth_logout")
+    @PostMapping("/auth/auth_logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
         authenticationServiceData.logout(new JwtAuthenticationResponseDto(token));
         return ResponseEntity.ok("Logged out successfully!");

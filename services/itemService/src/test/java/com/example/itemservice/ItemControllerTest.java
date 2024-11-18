@@ -38,16 +38,19 @@ public class ItemControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private ItemService items;
+    private ItemServiceData items;
 
     @MockBean
-    private UserServiceData persons;
+    private ItemServiceDataControllerMethods itemServiceDataControllerMethods;
 
     @MockBean
-    private TokenBlackListServiceData tokenBlackListServiceData;
+    private UserServiceData userService;
 
     @MockBean
-    private JwtServiceData jwtServiceData;
+    private TokenBlackListServiceData tokenBlackListService;
+
+    @MockBean
+    private JwtServiceData jwtService;
 
     @MockBean
     private SpringLiquibase liquibase;
@@ -72,9 +75,9 @@ public class ItemControllerTest {
     }
 
     private void setUpJwtMocks(String testJwt, int SetRole) {
-        when(jwtServiceData.isTokenValid(eq(testJwt), any(UserDetails.class))).thenReturn(true);
-        when(jwtServiceData.extractUserName(eq(testJwt))).thenReturn(setRoles(SetRole));
-        when(tokenBlackListServiceData.findByToken(eq(testJwt))).thenReturn(Optional.empty());
+        when(jwtService.isTokenValid(eq(testJwt), any(UserDetails.class))).thenReturn(true);
+        when(jwtService.extractUserName(eq(testJwt))).thenReturn(setRoles(SetRole));
+        when(tokenBlackListService.findByToken(eq(testJwt))).thenReturn(Optional.empty());
     }
 
     /*ТЕСТЫ НА МЕТОДЫ USER-а:_______________________________________________________________________________*/
@@ -167,7 +170,7 @@ public class ItemControllerTest {
         when(items.findById(1)).thenReturn(Optional.of(item));
         User user = new User();
         user.setUsername("testUser");
-        when(persons.getCurrentUser()).thenReturn(user);
+        when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Draft, "testUser")).thenReturn(true);
         when(items.update(item)).thenReturn(true);
 
@@ -196,7 +199,7 @@ public class ItemControllerTest {
         when(items.findById(1)).thenReturn(Optional.of(item));
         User user = new User();
         user.setUsername("testUser");
-        when(persons.getCurrentUser()).thenReturn(user);
+        when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(new Item(), Status.Draft, "testUser")).thenReturn(false);
         when(items.update(item)).thenReturn(false);
 
@@ -225,7 +228,7 @@ public class ItemControllerTest {
         when(items.findById(1)).thenReturn(Optional.of(item));
         User user = new User();
         user.setUsername("testUser");
-        when(persons.getCurrentUser()).thenReturn(user);
+        when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Draft, "testUser")).thenReturn(true);
         when(items.editItemDto(itemDto, 1)).thenReturn(Optional.of(item));
         when(items.update(item)).thenReturn(true);
@@ -256,7 +259,7 @@ public class ItemControllerTest {
         when(items.findById(1)).thenReturn(Optional.of(item));
         User user = new User();
         user.setUsername("testUser");
-        when(persons.getCurrentUser()).thenReturn(user);
+        when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(new Item(), Status.Draft, "testUser")).thenReturn(false);
         when(items.editItemDto(itemDto, 1)).thenReturn(Optional.of(item));
         when(items.update(item)).thenReturn(false);
@@ -288,7 +291,7 @@ public class ItemControllerTest {
         when(items.findById(1)).thenReturn(Optional.of(item));
         User user = new User();
         user.setUsername("testOper");
-        when(persons.getCurrentUser()).thenReturn(user);
+        when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Sent, null)).thenReturn(true);
 
         mockMvc.perform(get("/item/findItem/{id}", 1)
@@ -316,7 +319,7 @@ public class ItemControllerTest {
         when(items.findById(1)).thenReturn(Optional.of(item));
         User user = new User();
         user.setUsername("testOper");
-        when(persons.getCurrentUser()).thenReturn(user);
+        when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Sent, null)).thenReturn(false);
 
         mockMvc.perform(get("/item/findItem/{id}", 1)
@@ -344,7 +347,7 @@ public class ItemControllerTest {
         when(items.findById(1)).thenReturn(Optional.of(item));
         User user = new User();
         user.setUsername("testOper");
-        when(persons.getCurrentUser()).thenReturn(user);
+        when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Sent, null)).thenReturn(true);
         when(items.update(item)).thenReturn(true);
 
@@ -374,7 +377,7 @@ public class ItemControllerTest {
         when(items.findById(1)).thenReturn(Optional.of(item));
         User user = new User();
         user.setUsername("testOper");
-        when(persons.getCurrentUser()).thenReturn(user);
+        when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Sent, null)).thenReturn(false);
         when(items.update(item)).thenReturn(false);
 
@@ -404,7 +407,7 @@ public class ItemControllerTest {
         when(items.findById(1)).thenReturn(Optional.of(item));
         User user = new User();
         user.setUsername("testOper");
-        when(persons.getCurrentUser()).thenReturn(user);
+        when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Sent, null)).thenReturn(true);
         when(items.update(item)).thenReturn(true);
 
@@ -434,7 +437,7 @@ public class ItemControllerTest {
         when(items.findById(1)).thenReturn(Optional.of(item));
         User user = new User();
         user.setUsername("testOper");
-        when(persons.getCurrentUser()).thenReturn(user);
+        when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Sent, null)).thenReturn(false);
         when(items.update(item)).thenReturn(false);
 
@@ -470,7 +473,7 @@ public class ItemControllerTest {
         user3.setRoles(List.of(Role.ROLE_USER));
         List<User> users = Arrays.asList(user1, user2, user3);
         /* Настройка мок-сервиса*/
-        when(persons.findAll()).thenReturn(users);
+        when(userService.findAll()).thenReturn(users);
         mockMvc.perform(get("/item/findAllUsersList")
                         .header("Authorization", "Bearer " + testJwt)
                         .with(csrf())
@@ -495,8 +498,8 @@ public class ItemControllerTest {
         user.setRoles(List.of(Role.ROLE_USER));
 
         /* Настройка мок-сервиса*/
-        when(persons.setRoleOperator(userId)).thenReturn(Optional.of(user));
-        when(persons.update(any(User.class))).thenReturn(true);
+        when(userService.setRoleOperator(userId)).thenReturn(Optional.of(user));
+        when(userService.update(any(User.class))).thenReturn(true);
 
         mockMvc.perform(put("/item/setRoleOperator/{id}", userId)
                         .header("Authorization", "Bearer" + testJwt)
@@ -521,8 +524,8 @@ public class ItemControllerTest {
         user.setRoles(List.of(Role.ROLE_USER));
 
         /* Настройка мок-сервиса*/
-        when(persons.setRoleOperator(userId)).thenReturn(Optional.empty());
-        when(persons.update(any(User.class))).thenReturn(false);
+        when(userService.setRoleOperator(userId)).thenReturn(Optional.empty());
+        when(userService.update(any(User.class))).thenReturn(false);
 
         mockMvc.perform(put("/item/setRoleOperator/{id}", userId)
                         .header("Authorization", "Bearer" + testJwt)

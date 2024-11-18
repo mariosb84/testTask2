@@ -23,30 +23,21 @@ public class GlobalExceptionHandler {
         this.objectMapper = objectMapper;
     }
 
-    @ExceptionHandler(value = {NullPointerException.class})
+    @ExceptionHandler(value = {NullPointerException.class, IllegalArgumentException.class})
     public void handleException(Exception e, HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         response.setContentType("application/json");
-        response.getWriter().write(objectMapper.writeValueAsString(new HashMap<>() {
-            {
-                put("message", "Some of fields empty");
-                put("details", e.getMessage());
-            }
-        }));
-        LOGGER.error(e.getMessage());
-    }
 
-    /*EXEPTION HANDLER*/
-    @ExceptionHandler(value = {IllegalArgumentException.class})
-    public void exceptionHandler(Exception e, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        response.setContentType("application/json");
-        response.getWriter().write(objectMapper.writeValueAsString(new HashMap<>() {
-            {
-                put("message", e.getMessage());
-                put("type", e.getClass());
-            }
-        }));
+        HashMap<String, Object> errorResponse = new HashMap<>();
+        if (e instanceof NullPointerException) {
+            errorResponse.put("message", "Some of fields empty");
+            errorResponse.put("details", e.getMessage());
+        } else if (e instanceof IllegalArgumentException) {
+            errorResponse.put("message", e.getMessage());
+            errorResponse.put("type", e.getClass().getSimpleName());
+        }
+
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
         LOGGER.error(e.getLocalizedMessage());
     }
 
