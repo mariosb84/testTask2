@@ -40,7 +40,7 @@ public class UserController {
     /*ОБНОВИТЬ USER*/
     @PutMapping("/person/")
     @Validated(Operation.OnUpdate.class)
-    public ResponseEntity<Boolean> update(@Valid @RequestBody UserDto person) {
+    public ResponseEntity<Boolean> update(@Valid @RequestBody User person) {
        return persons.update(person);
     }
 

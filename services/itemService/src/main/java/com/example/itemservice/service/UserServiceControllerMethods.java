@@ -14,7 +14,7 @@ public interface UserServiceControllerMethods {
 
      ResponseEntity<User> create(User user);
 
-     ResponseEntity<Boolean> update(UserDto person);
+     ResponseEntity<Boolean> update(User person);
 
      ResponseEntity<Boolean> delete(int id);
 

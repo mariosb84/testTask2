@@ -15,7 +15,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,7 +43,7 @@ public class ItemControllerTest {
     private ItemServiceData items;
 
     @MockBean
-    private ItemServiceDataControllerMethods itemServiceDataControllerMethods;
+    private ItemServiceDataControllerMethods itemServiceControllerMethods;
 
     @MockBean
     private UserServiceData userService;
@@ -97,6 +99,8 @@ public class ItemControllerTest {
 
         when(items.addItemDto(any(ItemDto.class))).thenReturn(item);
         when(items.add(any(Item.class))).thenReturn(Optional.of(item));
+        when(itemServiceControllerMethods.create(any(ItemDto.class)))
+                .thenReturn(new ResponseEntity<>(item, HttpStatus.CREATED));
 
         mockMvc.perform(post("/item/createItem")
                         .header("Authorization", "Bearer " + testJwt)
@@ -120,6 +124,8 @@ public class ItemControllerTest {
         Item item = new Item();
         when(items.addItemDto(any(ItemDto.class))).thenReturn(item);
         when(items.add(any(Item.class))).thenReturn(Optional.of(item));
+        when(itemServiceControllerMethods.create(any(ItemDto.class)))
+                .thenReturn(new ResponseEntity<>(item, HttpStatus.CREATED));
 
         mockMvc.perform(post("/item/createItem")
                         .header("Authorization", "Bearer " + testJwt)
@@ -142,6 +148,8 @@ public class ItemControllerTest {
         Item item = new Item();
         when(items.addItemDto(itemDto)).thenReturn(item);
         when(items.add(item)).thenReturn(Optional.empty());
+     when(itemServiceControllerMethods.create(any(ItemDto.class)))
+             .thenReturn(new ResponseEntity<>(item, HttpStatus.CONFLICT));
 
      mockMvc.perform(post("/item/createItem")
                      .header("Authorization", "Bearer " + testJwt)
@@ -173,6 +181,8 @@ public class ItemControllerTest {
         when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Draft, "testUser")).thenReturn(true);
         when(items.update(item)).thenReturn(true);
+        when(itemServiceControllerMethods.sendItem(any(Integer.class)))
+                .thenReturn(new ResponseEntity<>(item, HttpStatus.OK));
 
         mockMvc.perform(put("/item/sendItem/{id}", 1)
                         .header("Authorization", "Bearer " + testJwt)
@@ -194,14 +204,16 @@ public class ItemControllerTest {
         Item item = new Item();
         item.setName(itemDto.getName());
         item.setItemText(itemDto.getItemText());
-        item.setStatus(Status.Sent);
+        item.setStatus(Status.Rejected);
 
         when(items.findById(1)).thenReturn(Optional.of(item));
         User user = new User();
         user.setUsername("testUser");
         when(userService.getCurrentUser()).thenReturn(user);
-        when(items.itemContains(new Item(), Status.Draft, "testUser")).thenReturn(false);
+        when(items.itemContains(item, Status.Draft, "testUser")).thenReturn(false);
         when(items.update(item)).thenReturn(false);
+        when(itemServiceControllerMethods.sendItem(any(Integer.class)))
+                .thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
         mockMvc.perform(put("/item/sendItem/{id}", 1)
                         .header("Authorization", "Bearer " + testJwt)
@@ -232,6 +244,8 @@ public class ItemControllerTest {
         when(items.itemContains(item, Status.Draft, "testUser")).thenReturn(true);
         when(items.editItemDto(itemDto, 1)).thenReturn(Optional.of(item));
         when(items.update(item)).thenReturn(true);
+        when(itemServiceControllerMethods.editUserItem(any(Integer.class), any(ItemDto.class)))
+                .thenReturn(new ResponseEntity<>(item, HttpStatus.OK));
 
 
         mockMvc.perform(put("/item/editUserItem/{id}", 1)
@@ -254,15 +268,17 @@ public class ItemControllerTest {
         Item item = new Item();
         item.setName(itemDto.getName());
         item.setItemText(itemDto.getItemText());
-        item.setStatus(Status.Sent);
+        item.setStatus(Status.Rejected);
 
         when(items.findById(1)).thenReturn(Optional.of(item));
         User user = new User();
         user.setUsername("testUser");
         when(userService.getCurrentUser()).thenReturn(user);
-        when(items.itemContains(new Item(), Status.Draft, "testUser")).thenReturn(false);
+        when(items.itemContains(item, Status.Draft, "testUser")).thenReturn(false);
         when(items.editItemDto(itemDto, 1)).thenReturn(Optional.of(item));
         when(items.update(item)).thenReturn(false);
+        when(itemServiceControllerMethods.editUserItem(any(Integer.class), any(ItemDto.class)))
+                .thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
         mockMvc.perform(put("/item/editUserItem/{id}", 1)
                         .header("Authorization", "Bearer " + testJwt)
@@ -293,6 +309,8 @@ public class ItemControllerTest {
         user.setUsername("testOper");
         when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Sent, null)).thenReturn(true);
+        when(itemServiceControllerMethods.findItem(any(Integer.class)))
+                .thenReturn(new ResponseEntity<>(item, HttpStatus.OK));
 
         mockMvc.perform(get("/item/findItem/{id}", 1)
                         .header("Authorization", "Bearer " + testJwt)
@@ -321,6 +339,8 @@ public class ItemControllerTest {
         user.setUsername("testOper");
         when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Sent, null)).thenReturn(false);
+        when(itemServiceControllerMethods.findItem(any(Integer.class)))
+                .thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
         mockMvc.perform(get("/item/findItem/{id}", 1)
                         .header("Authorization", "Bearer " + testJwt)
@@ -350,6 +370,8 @@ public class ItemControllerTest {
         when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Sent, null)).thenReturn(true);
         when(items.update(item)).thenReturn(true);
+        when(itemServiceControllerMethods.acceptItem(any(Integer.class)))
+                .thenReturn(new ResponseEntity<>(item, HttpStatus.OK));
 
         mockMvc.perform(put("/item/acceptItem/{id}", 1)
                         .header("Authorization", "Bearer " + testJwt)
@@ -380,6 +402,8 @@ public class ItemControllerTest {
         when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Sent, null)).thenReturn(false);
         when(items.update(item)).thenReturn(false);
+        when(itemServiceControllerMethods.acceptItem(any(Integer.class)))
+                .thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
         mockMvc.perform(put("/item/acceptItem/{id}", 1)
                         .header("Authorization", "Bearer " + testJwt)
@@ -410,6 +434,8 @@ public class ItemControllerTest {
         when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Sent, null)).thenReturn(true);
         when(items.update(item)).thenReturn(true);
+        when(itemServiceControllerMethods.rejectItem(any(Integer.class)))
+                .thenReturn(new ResponseEntity<>(item, HttpStatus.OK));
 
         mockMvc.perform(put("/item/rejectItem/{id}", 1)
                         .header("Authorization", "Bearer " + testJwt)
@@ -440,6 +466,8 @@ public class ItemControllerTest {
         when(userService.getCurrentUser()).thenReturn(user);
         when(items.itemContains(item, Status.Sent, null)).thenReturn(false);
         when(items.update(item)).thenReturn(false);
+        when(itemServiceControllerMethods.rejectItem(any(Integer.class)))
+                .thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
         mockMvc.perform(put("/item/rejectItem/{id}", 1)
                         .header("Authorization", "Bearer " + testJwt)
@@ -474,6 +502,8 @@ public class ItemControllerTest {
         List<User> users = Arrays.asList(user1, user2, user3);
         /* Настройка мок-сервиса*/
         when(userService.findAll()).thenReturn(users);
+        when(itemServiceControllerMethods.findAllUsersList())
+                .thenReturn(users);
         mockMvc.perform(get("/item/findAllUsersList")
                         .header("Authorization", "Bearer " + testJwt)
                         .with(csrf())
@@ -500,6 +530,8 @@ public class ItemControllerTest {
         /* Настройка мок-сервиса*/
         when(userService.setRoleOperator(userId)).thenReturn(Optional.of(user));
         when(userService.update(any(User.class))).thenReturn(true);
+        when(itemServiceControllerMethods.setRoleOperator(any(Integer.class)))
+                .thenReturn(new ResponseEntity<>(true, HttpStatus.OK));
 
         mockMvc.perform(put("/item/setRoleOperator/{id}", userId)
                         .header("Authorization", "Bearer" + testJwt)
@@ -526,6 +558,8 @@ public class ItemControllerTest {
         /* Настройка мок-сервиса*/
         when(userService.setRoleOperator(userId)).thenReturn(Optional.empty());
         when(userService.update(any(User.class))).thenReturn(false);
+        when(itemServiceControllerMethods.setRoleOperator(any(Integer.class)))
+                .thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
         mockMvc.perform(put("/item/setRoleOperator/{id}", userId)
                         .header("Authorization", "Bearer" + testJwt)

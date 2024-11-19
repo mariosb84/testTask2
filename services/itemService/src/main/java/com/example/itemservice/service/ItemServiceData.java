@@ -45,6 +45,7 @@ public class ItemServiceData implements ItemService {
 
     @Override
     public boolean delete(Item item) {
+        itemRepository.delete(item);
         return itemRepository.findById(item.getId()).isEmpty();
     }
 

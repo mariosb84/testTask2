@@ -60,8 +60,8 @@ public class UserServiceDataControllerMethods implements UserServiceControllerMe
 
     /*ОБНОВИТЬ USER*/
     @Override
-    public ResponseEntity<Boolean> update(UserDto person) {
-        if ((this.persons.updatePatch(person))) {
+    public ResponseEntity<Boolean> update(User person) {
+        if ((this.persons.update(person))) {
             return ResponseEntity.ok().build();
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Объект не обновлен!");
